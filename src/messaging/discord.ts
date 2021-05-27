@@ -160,7 +160,7 @@ export async function getDMResponseAsync(
           after: botMessage?.id,
         });
         const lastUserMessage = messages
-          .filter(message => message.reference?.messageID === botMessage?.id)
+          // .filter(message => message.reference?.messageID === botMessage?.id)
           .last();
         if (!lastUserMessage) {
           if (iteration >= iterations) {

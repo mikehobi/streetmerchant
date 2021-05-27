@@ -7,11 +7,15 @@ import {config} from '../config';
  * @param brand The brand of the GPU
  */
 function filterBrand(brand: Link['brand']): boolean {
-  if (config.store.showOnlyBrands.length === 0) {
-    return true;
+  if (config.store.excludedBrands.length !== 0) {
+    return !config.store.excludedBrands.includes(brand);
   }
 
-  return config.store.showOnlyBrands.includes(brand);
+  if (config.store.showOnlyBrands.length !== 0) {
+    return config.store.showOnlyBrands.includes(brand);
+  }
+
+  return true;
 }
 
 /**
@@ -21,28 +25,45 @@ function filterBrand(brand: Link['brand']): boolean {
  * @param series The series of the GPU
  */
 function filterModel(model: Link['model'], series: Link['series']): boolean {
-  if (config.store.showOnlyModels.length === 0) {
+  const sanitizedModel = model.replace(/\s/g, '');
+  const sanitizedSeries = series.replace(/\s/g, '');
+
+  if (config.store.excludedModels.length !== 0) {
+    for (const configModelEntry of config.store.excludedModels) {
+      const sanitizedConfigModel = configModelEntry.name.replace(/\s/g, '');
+      const sanitizedConfigSeries = configModelEntry.series.replace(/\s/g, '');
+      if (sanitizedConfigSeries) {
+        if (
+          sanitizedSeries === sanitizedConfigSeries &&
+          sanitizedModel === sanitizedConfigModel
+        ) {
+          return false;
+        }
+      } else if (sanitizedModel === sanitizedConfigModel) {
+        return false;
+      }
+    }
     return true;
   }
 
-  const sanitizedModel = model.replace(/\s/g, '');
-  const sanitizedSeries = series.replace(/\s/g, '');
-  for (const configModelEntry of config.store.showOnlyModels) {
-    const sanitizedConfigModel = configModelEntry.name.replace(/\s/g, '');
-    const sanitizedConfigSeries = configModelEntry.series.replace(/\s/g, '');
-    if (sanitizedConfigSeries) {
-      if (
-        sanitizedSeries === sanitizedConfigSeries &&
-        sanitizedModel === sanitizedConfigModel
-      ) {
+  if (config.store.showOnlyModels.length !== 0) {
+    for (const configModelEntry of config.store.showOnlyModels) {
+      const sanitizedConfigModel = configModelEntry.name.replace(/\s/g, '');
+      const sanitizedConfigSeries = configModelEntry.series.replace(/\s/g, '');
+      if (sanitizedConfigSeries) {
+        if (
+          sanitizedSeries === sanitizedConfigSeries &&
+          sanitizedModel === sanitizedConfigModel
+        ) {
+          return true;
+        }
+      } else if (sanitizedModel === sanitizedConfigModel) {
         return true;
       }
-    } else if (sanitizedModel === sanitizedConfigModel) {
-      return true;
     }
+    return false;
   }
-
-  return false;
+  return true;
 }
 
 /**

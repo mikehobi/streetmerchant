@@ -360,6 +360,22 @@ function printConfig() {
     );
   }
 
+  if (config.store.excludedBrands.length > 0) {
+    logger.info(`ℹ excluded brands: ${config.store.excludedBrands.join(', ')}`);
+  }
+
+  if (config.store.excludedModels.length > 0) {
+    logger.info(
+      `ℹ excluded models: ${config.store.excludedModels
+        .map(entry => {
+          return entry.series
+            ? entry.name + ' (' + entry.series + ')'
+            : entry.name;
+        })
+        .join(', ')}`
+    );
+  }
+
   if (config.store.showOnlySeries.length > 0) {
     logger.info(`ℹ selected series: ${config.store.showOnlySeries.join(', ')}`);
   }

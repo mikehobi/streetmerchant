@@ -38,11 +38,12 @@ function envOrArray(
   environment: string | undefined,
   array?: string[]
 ): string[] {
-  return (environment
-    ? environment.includes('\n')
-      ? environment.split('\n')
-      : environment.split(',')
-    : array ?? []
+  return (
+    environment
+      ? environment.includes('\n')
+        ? environment.split('\n')
+        : environment.split(',')
+      : array ?? []
   ).map(s => s.trim());
 }
 
@@ -458,6 +459,14 @@ const store = {
     'xboxss',
     'xboxsx',
   ]),
+  excludedBrands: envOrArray(process.env.EXCLUDED_BRANDS),
+  excludedModels: envOrArray(process.env.EXCLUDED_MODELS).map(entry => {
+    const [name, series] = entry.match(/[^:]+/g) ?? [];
+    return {
+      name: envOrString(name),
+      series: envOrString(series),
+    };
+  }),
   stores: envOrArray(process.env.STORES, ['amazon', 'bestbuy']).map(entry => {
     const [name, minPageSleep, maxPageSleep] = entry.match(/[^:]+/g) ?? [];
 
